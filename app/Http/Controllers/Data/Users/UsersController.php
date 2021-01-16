@@ -14,4 +14,11 @@ class UsersController extends Controller
             'results' => User::latest()->paginate(20)
         ]);
     }
+
+    public function store(Request $request)
+    {
+        return response([
+            'data' => $request->all()
+        ]);
+    }
 }

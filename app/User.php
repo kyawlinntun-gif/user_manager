@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role'
+        'name', 'email', 'password', 'role', 'settings'
     ];
 
     /**
@@ -35,10 +35,20 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'settings' => 'array'
+    ];
+
+    protected $appends = [
+        'user_since'
     ];
 
     public function isAdmin()
     {
         return $this->role === 'admin';
+    }
+
+    public function getUserSinceAttribute()
+    {
+        return date('F d,Y', strtotime($this->created_at));
     }
 }
