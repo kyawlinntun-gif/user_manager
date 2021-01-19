@@ -4,6 +4,14 @@
             <div class="card-body">
                 <h3>Manage Users <button class="btn btn-sm btn-outline-success float-right" @click="setActive('createUser')"><i class="fas fa-plus"></i> User</button></h3>
 
+                <div v-if="success_message != ''" class="alert alert-info">
+                    {{ success_message }}
+                </div>
+
+                <div class="alert alert-danger" v-if="unauthorized_message != ''">
+                    {{ unauthorized_message }}
+                </div>
+
                 <paginator v-if="results !== null" :results="data" v-on:getPage="getPage"></paginator>
 
                 <PaginatorDetail v-if="results !== null" :results="data"></PaginatorDetail>
@@ -27,6 +35,9 @@
                                     <button class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <button class="btn btn-sm btn-danger" @click="deleteUser(user)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -38,7 +49,7 @@
             </div>
         </div>
 
-        <CreateUser v-if="active.createUser" v-on:dashboard="setActive('dashboard')"></CreateUser>
+        <CreateUser v-if="active.createUser" v-on:dashboard="setActive('dashboard')" v-on:create-user-success-info="createUserSuccessFlashMessage"></CreateUser>
     </div>
 </template>
 
@@ -60,9 +71,11 @@ export default {
             },
             data: null,
             active: {
-                dashboard: false,
-                createUser: true
-            }
+                dashboard: true,
+                createUser: false
+            },
+            success_message: '',
+            unauthorized_message: ''
         }
     },
     mounted() {
@@ -90,6 +103,42 @@ export default {
         {
             Object.keys(this.active).forEach((key) => this.active[key] = false);
             this.active[component] = true;
+        },
+        createUserSuccessFlashMessage(message)
+        {
+            this.flashMessageIntervals(message);
+            this.getUsers();
+        },
+        flashMessageIntervals(message)
+        {
+            this.success_message = message;
+            setTimeout(() => {
+                this.success_message = '';
+            }, 5000);
+        },
+        deleteUser(user)
+        {
+            let r = confirm('Are you sure want to delete ' + user.name + ' from the system');
+            if(r)
+            {
+                axios.delete('/data/users/'+user.id)
+                    .then((response) => {
+                        console.log(response);
+                    })
+                    .catch((errors) => {
+                        if(errors.response.status === 403)
+                        {
+                           this.flashDanger('Unauthorized to access!'); 
+                        }
+                    });
+            }
+        },
+        flashDanger(message)
+        {
+            this.unauthorized_message = message;
+            setTimeout(() => {
+                this.unauthorized_message = '';
+            }, 5000)
         }
     }
 }

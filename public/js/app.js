@@ -6387,6 +6387,24 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -6444,16 +6462,53 @@ __webpack_require__.r(__webpack_exports__);
         role: 'user',
         password: '',
         confirm_password: ''
-      }
+      },
+      errors: []
     };
+  },
+  created: function created() {
+    this.resetForm();
   },
   methods: {
     storeUser: function storeUser() {
+      var _this = this;
+
+      this.errors = [];
       axios.post('/data/users', this.form).then(function (response) {
-        console.log(response);
+        _this.resetForm();
+
+        _this.$emit('dashboard');
+
+        _this.$emit('create-user-success-info', 'Successfully created user: ' + response.data.user.name + ' | email: ' + response.data.user.email);
       })["catch"](function (errors) {
-        console.log(errors);
+        if (errors.response.status === 422) {
+          _this.flashErrors(errors.response.data.errors);
+        } else if (errors.response.status === 403) {
+          _this.errors = ["You are not authorized to create users"];
+        }
       });
+    },
+    flashErrors: function flashErrors(errors) {
+      // for(const [key, value] of Object.entries(errors))
+      // {
+      //     this.errors.push(value);
+      // }
+      // console.log(this.errors);
+      for (var _i = 0, _Object$entries = Object.entries(errors); _i < _Object$entries.length; _i++) {
+        var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
+            key = _Object$entries$_i[0],
+            value = _Object$entries$_i[1];
+
+        for (var item in value) {
+          this.errors.push(value[item]);
+        }
+      }
+    },
+    resetForm: function resetForm() {
+      this.form.name = '';
+      this.form.email = '';
+      this.form.password = '';
+      this.form.confirm_password = '';
     }
   }
 });
@@ -6516,6 +6571,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -6534,9 +6600,11 @@ __webpack_require__.r(__webpack_exports__);
       },
       data: null,
       active: {
-        dashboard: false,
-        createUser: true
-      }
+        dashboard: true,
+        createUser: false
+      },
+      success_message: '',
+      unauthorized_message: ''
     };
   },
   mounted: function mounted() {
@@ -6568,6 +6636,41 @@ __webpack_require__.r(__webpack_exports__);
         return _this2.active[key] = false;
       });
       this.active[component] = true;
+    },
+    createUserSuccessFlashMessage: function createUserSuccessFlashMessage(message) {
+      this.flashMessageIntervals(message);
+      this.getUsers();
+    },
+    flashMessageIntervals: function flashMessageIntervals(message) {
+      var _this3 = this;
+
+      this.success_message = message;
+      setTimeout(function () {
+        _this3.success_message = '';
+      }, 5000);
+    },
+    deleteUser: function deleteUser(user) {
+      var _this4 = this;
+
+      var r = confirm('Are you sure want to delete ' + user.name + ' from the system');
+
+      if (r) {
+        axios["delete"]('/data/users/' + user.id).then(function (response) {
+          console.log(response);
+        })["catch"](function (errors) {
+          if (errors.response.status === 403) {
+            _this4.flashDanger('Unauthorized to access!');
+          }
+        });
+      }
+    },
+    flashDanger: function flashDanger(message) {
+      var _this5 = this;
+
+      this.unauthorized_message = message;
+      setTimeout(function () {
+        _this5.unauthorized_message = '';
+      }, 5000);
     }
   }
 });
@@ -42256,6 +42359,19 @@ var render = function() {
       _vm._v(" "),
       _c("hr"),
       _vm._v(" "),
+      _vm.errors.length > 0
+        ? _c(
+            "div",
+            { staticClass: "alert alert-warning", attrs: { role: "alert" } },
+            _vm._l(_vm.errors, function(error) {
+              return _c("ul", { key: error }, [
+                _c("li", [_vm._v(_vm._s(error))])
+              ])
+            }),
+            0
+          )
+        : _vm._e(),
+      _vm._v(" "),
       _c(
         "form",
         {
@@ -42395,7 +42511,11 @@ var render = function() {
                   }
                 ],
                 staticClass: "form-control",
-                attrs: { type: "password" },
+                attrs: {
+                  type: "password",
+                  placeholder:
+                    "Must contain a lower and uppercase letter, a number and a special character"
+                },
                 domProps: { value: _vm.form.password },
                 on: {
                   input: function($event) {
@@ -42498,6 +42618,26 @@ var render = function() {
                   )
                 ]),
                 _vm._v(" "),
+                _vm.success_message != ""
+                  ? _c("div", { staticClass: "alert alert-info" }, [
+                      _vm._v(
+                        "\n                " +
+                          _vm._s(_vm.success_message) +
+                          "\n            "
+                      )
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.unauthorized_message != ""
+                  ? _c("div", { staticClass: "alert alert-danger" }, [
+                      _vm._v(
+                        "\n                " +
+                          _vm._s(_vm.unauthorized_message) +
+                          "\n            "
+                      )
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
                 _vm.results !== null
                   ? _c("paginator", {
                       attrs: { results: _vm.data },
@@ -42523,7 +42663,24 @@ var render = function() {
                             _vm._v(" "),
                             _c("td", [_vm._v(_vm._s(user.user_since))]),
                             _vm._v(" "),
-                            _vm._m(1, true)
+                            _c("td", [
+                              _c("div", { staticClass: "btn-group" }, [
+                                _vm._m(1, true),
+                                _vm._v(" "),
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-sm btn-danger",
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.deleteUser(user)
+                                      }
+                                    }
+                                  },
+                                  [_c("i", { staticClass: "fas fa-trash" })]
+                                )
+                              ])
+                            ])
                           ])
                         }),
                         0
@@ -42548,7 +42705,8 @@ var render = function() {
             on: {
               dashboard: function($event) {
                 return _vm.setActive("dashboard")
-              }
+              },
+              "create-user-success-info": _vm.createUserSuccessFlashMessage
             }
           })
         : _vm._e()
@@ -42577,12 +42735,8 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("div", { staticClass: "btn-group" }, [
-        _c("button", { staticClass: "btn btn-sm btn-warning" }, [
-          _c("i", { staticClass: "fas fa-edit" })
-        ])
-      ])
+    return _c("button", { staticClass: "btn btn-sm btn-warning" }, [
+      _c("i", { staticClass: "fas fa-edit" })
     ])
   }
 ]
