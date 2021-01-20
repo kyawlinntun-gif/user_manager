@@ -32,6 +32,9 @@
                             <td>{{user.user_since }}</td>
                             <td>
                                 <div class="btn-group">
+                                    <button class="btn btn-sm btn-secondary" title="View User Logs" @click="viewUserLogs(user)">
+                                        <i class="fas fa-list-alt"></i>
+                                    </button>
                                     <button class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -50,6 +53,7 @@
         </div>
 
         <CreateUser v-if="active.createUser" v-on:dashboard="setActive('dashboard')" v-on:create-user-success-info="createUserSuccessFlashMessage"></CreateUser>
+        <UserLogs v-if="active.userLogs" :user="user" v-on:dashboard="setActive('dashboard')"></UserLogs>
     </div>
 </template>
 
@@ -57,11 +61,12 @@
 import Paginator from '../utilities/pagination/Paginator.vue';
 import PaginatorDetail from '../utilities/pagination/PaginatorDetail.vue';
 import CreateUser from './CreateUser.vue';
+import UserLogs from './logs/UserLogs.vue';
 
 export default {
     name: 'UsersManagementDashboard',
     components: {
-        Paginator, PaginatorDetail, CreateUser
+        Paginator, PaginatorDetail, CreateUser, UserLogs
     },
     data() {
         return {
@@ -72,10 +77,12 @@ export default {
             data: null,
             active: {
                 dashboard: true,
-                createUser: false
+                createUser: false,
+                userLogs: false
             },
             success_message: '',
-            unauthorized_message: ''
+            unauthorized_message: '',
+            user: {}
         }
     },
     mounted() {
@@ -123,7 +130,8 @@ export default {
             {
                 axios.delete('/data/users/'+user.id)
                     .then((response) => {
-                        console.log(response);
+                        this.flashMessageIntervals('Successfully deleted user');
+                        this.getUsers();
                     })
                     .catch((errors) => {
                         if(errors.response.status === 403)
@@ -139,6 +147,11 @@ export default {
             setTimeout(() => {
                 this.unauthorized_message = '';
             }, 5000)
+        },
+        viewUserLogs(user)
+        {
+            this.user = user;
+            this.setActive('userLogs');
         }
     }
 }

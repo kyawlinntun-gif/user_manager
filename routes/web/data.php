@@ -7,8 +7,13 @@ use Illuminate\Support\Facades\Route;
  * namespace: Data
  */
 
- Route::prefix('users')->namespace('Users')->group(function() {
+Route::prefix('users')->namespace('Users')->group(function() {
+
+    Route::prefix('logs')->namespace('Logs')->group(function() {
+        Route::get('/{user}', 'UserLogsController@index');
+    });
+
     Route::get('/', 'UsersController@index');
     Route::post('/', 'UsersController@store');
     Route::delete('/{user}', 'UsersController@destroy');
- });
+});

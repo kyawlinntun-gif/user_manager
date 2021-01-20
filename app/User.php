@@ -42,6 +42,11 @@ class User extends Authenticatable
         'user_since'
     ];
 
+    protected $dispatchesEvents = [
+        'created' => 'App\Events\Users\CreatedUser',
+        'deleting' => 'App\Events\Users\DeletingUser'
+    ];
+
     public function isAdmin()
     {
         return $this->role === 'admin';
