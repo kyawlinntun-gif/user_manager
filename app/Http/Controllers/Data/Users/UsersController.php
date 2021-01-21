@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Data\Users;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class UsersController extends Controller
     public function index()
     {
         return response([
-            'results' => User::latest()->paginate(20)
+            'results' => User::latest('updated_at')->paginate(20)
         ]);
     }
 
@@ -36,6 +37,15 @@ class UsersController extends Controller
 
         return response([
             'user' => $user
+        ]);
+    }
+
+    public function update(UpdateUserRequest $request, User $user)
+    {
+        $user->update($request->validated());
+
+        return response([
+            'user' => $user->only('id', 'name', 'email', 'role')
         ]);
     }
 

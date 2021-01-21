@@ -15,5 +15,6 @@ Route::prefix('users')->namespace('Users')->group(function() {
 
     Route::get('/', 'UsersController@index');
     Route::post('/', 'UsersController@store');
+    Route::match(['put', 'patch'], '/{user}', 'UsersController@update');
     Route::delete('/{user}', 'UsersController@destroy');
 });

@@ -35,7 +35,7 @@
                                     <button class="btn btn-sm btn-secondary" title="View User Logs" @click="viewUserLogs(user)">
                                         <i class="fas fa-list-alt"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-warning">
+                                    <button class="btn btn-sm btn-warning" title="Edit User" @click="editUser(user)">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button class="btn btn-sm btn-danger" @click="deleteUser(user)">
@@ -54,6 +54,7 @@
 
         <CreateUser v-if="active.createUser" v-on:dashboard="setActive('dashboard')" v-on:create-user-success-info="createUserSuccessFlashMessage"></CreateUser>
         <UserLogs v-if="active.userLogs" :user="user" v-on:dashboard="setActive('dashboard')"></UserLogs>
+        <EditUser v-if="active.editUser" v-on:dashboard="setActive('dashboard')" v-on:create-user-success-info="createUserSuccessFlashMessage" :user="user" v-on:edit-user-success-info="updateUserSuccessFlashMessage"></EditUser>
     </div>
 </template>
 
@@ -62,11 +63,12 @@ import Paginator from '../utilities/pagination/Paginator.vue';
 import PaginatorDetail from '../utilities/pagination/PaginatorDetail.vue';
 import CreateUser from './CreateUser.vue';
 import UserLogs from './logs/UserLogs.vue';
+import EditUser from './EditUser.vue';
 
 export default {
     name: 'UsersManagementDashboard',
     components: {
-        Paginator, PaginatorDetail, CreateUser, UserLogs
+        Paginator, PaginatorDetail, CreateUser, UserLogs, EditUser
     },
     data() {
         return {
@@ -78,7 +80,8 @@ export default {
             active: {
                 dashboard: true,
                 createUser: false,
-                userLogs: false
+                userLogs: false,
+                editUser: false
             },
             success_message: '',
             unauthorized_message: '',
@@ -112,6 +115,11 @@ export default {
             this.active[component] = true;
         },
         createUserSuccessFlashMessage(message)
+        {
+            this.flashMessageIntervals(message);
+            this.getUsers();
+        },
+        updateUserSuccessFlashMessage(message)
         {
             this.flashMessageIntervals(message);
             this.getUsers();
@@ -152,6 +160,11 @@ export default {
         {
             this.user = user;
             this.setActive('userLogs');
+        },
+        editUser(user)
+        {
+            this.user = user;
+            this.setActive('editUser');
         }
     }
 }

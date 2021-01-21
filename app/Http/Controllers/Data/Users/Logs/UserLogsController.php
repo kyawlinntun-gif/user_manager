@@ -9,6 +9,12 @@ use App\Http\Controllers\Controller;
 
 class UserLogsController extends Controller
 {
+    
+    public function __construct()
+    {
+        return $this->middleware('isUser')->only('index');
+    }
+
     public function index(User $user)
     {
         $userLogs = UserLog::byUser($user->id)->latest()->paginate(50);
