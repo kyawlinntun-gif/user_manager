@@ -38,6 +38,9 @@
                                     <button class="btn btn-sm btn-warning" title="Edit User" @click="editUser(user)">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <button class="btn btn-sm btn-secondary" title="Edit User" @click="editPassword(user)">
+                                        <i class="fas fa-key"></i>
+                                    </button>
                                     <button class="btn btn-sm btn-danger" @click="deleteUser(user)">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -54,7 +57,8 @@
 
         <CreateUser v-if="active.createUser" v-on:dashboard="setActive('dashboard')" v-on:create-user-success-info="createUserSuccessFlashMessage"></CreateUser>
         <UserLogs v-if="active.userLogs" :user="user" v-on:dashboard="setActive('dashboard')"></UserLogs>
-        <EditUser v-if="active.editUser" v-on:dashboard="setActive('dashboard')" v-on:create-user-success-info="createUserSuccessFlashMessage" :user="user" v-on:edit-user-success-info="updateUserSuccessFlashMessage"></EditUser>
+        <EditUser v-if="active.editUser" v-on:dashboard="setActive('dashboard')" :user="user" v-on:edit-user-success-info="updateUserSuccessFlashMessage"></EditUser>
+        <EditUserPassword v-if="active.editPassword" v-on:dashboard="setActive('dashboard')" :user="user" v-on:edit-user-password-success-info="updateUserSuccessFlashMessage" v-on:send-reset-link="updateUserSuccessFlashMessage"></EditUserPassword>
     </div>
 </template>
 
@@ -64,11 +68,12 @@ import PaginatorDetail from '../utilities/pagination/PaginatorDetail.vue';
 import CreateUser from './CreateUser.vue';
 import UserLogs from './logs/UserLogs.vue';
 import EditUser from './EditUser.vue';
+import EditUserPassword from './EditUserPassword.vue';
 
 export default {
     name: 'UsersManagementDashboard',
     components: {
-        Paginator, PaginatorDetail, CreateUser, UserLogs, EditUser
+        Paginator, PaginatorDetail, CreateUser, UserLogs, EditUser, EditUserPassword
     },
     data() {
         return {
@@ -81,7 +86,8 @@ export default {
                 dashboard: true,
                 createUser: false,
                 userLogs: false,
-                editUser: false
+                editUser: false,
+                editPassword: false
             },
             success_message: '',
             unauthorized_message: '',
@@ -165,6 +171,11 @@ export default {
         {
             this.user = user;
             this.setActive('editUser');
+        },
+        editPassword(user)
+        {
+            this.user = user;
+            this.setActive('editPassword');
         }
     }
 }
