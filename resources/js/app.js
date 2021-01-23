@@ -22,6 +22,7 @@ window.Vue = require('vue');
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('users-management-dashboard', require('./components/users/UsersManagementDashboard.vue').default);
+Vue.component('user-account-settings', require('./components/accounts/UserAccountSettings.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

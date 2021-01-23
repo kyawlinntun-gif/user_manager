@@ -27,3 +27,7 @@ Route::prefix('users')->namespace('Users')->name('users.')->middleware(['web', '
 });
 
 Route::prefix('data')->namespace('Data')->middleware(['web', 'auth'])->group(base_path('routes/web/data.php'));
+
+Route::prefix('accounts')->namespace('Accounts')->name('accounts.')->middleware(['web', 'auth'])->group(function() {
+    Route::get('/', 'UserAccountsController@index')->name('dashboard');
+});

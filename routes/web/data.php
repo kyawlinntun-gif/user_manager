@@ -7,6 +7,13 @@ use Illuminate\Support\Facades\Route;
  * namespace: Data
  */
 
+Route::prefix('accounts')->namespace('Accounts')->group(function() {
+    Route::get('/user/{user?}', 'UserController@index');
+    Route::prefix('updates')->namespace('Updates')->group(function() {
+        Route::match(['put', 'patch'],'/user/{user}', 'UpdatedEmailController@update');
+    });
+});
+
 Route::prefix('users')->namespace('Users')->group(function() {
 
     Route::prefix('logs')->namespace('Logs')->group(function() {
