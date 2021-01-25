@@ -5,11 +5,11 @@
 
             <hr>
 
-            <!-- <div class="alert alert-warning" role="alert" v-if="errors.length > 0">
+            <div class="alert alert-warning" role="alert" v-if="errors.length > 0">
                 <ul v-for="error in errors" :key="error">
                     <li>{{ error }}</li>
                 </ul>
-            </div> -->
+            </div>
 
             <form @submit.prevent="updatedEmail">
                 <div class="form-group row">
@@ -41,7 +41,8 @@ export default {
             form: {
                 email: '',
                 password: ''
-            }
+            },
+            errors: []
         }
     },
     mounted() {
@@ -50,8 +51,36 @@ export default {
     methods: {
         updatedEmail() {
             axios.put('/data/accounts/updates/user/' + this.user.id, this.form)
-                .then(response => console.log(response))
-                .catch(errors => console.log(errors));
+                .then(response => {
+                    this.resetForm();
+                    this.$emit('dashboard');
+                    this.$emit('updated-email', 'Successfully updated the email for ' + response.data.user.name);
+                })
+                .catch(errors => {
+                    if(errors.response.status === 422)
+                    {
+                        this.flashErrors(errors.response.data.errors);
+                    }
+                    else if(errors.response.status === 403)
+                    {
+                        this.errors = ["Not autorized to change this data. Please verfiy your password is corret"];
+                    }
+                });
+        },
+        flashErrors(errors)
+        {
+            for(const [key, value] of Object.entries(errors))
+            {
+                for(let item in value)
+                {
+                    this.errors.push(value[item]);
+                }
+            }
+        },
+        resetForm()
+        {
+            this.form.email = '';
+            this.form.password = '';
         }
     }
 }

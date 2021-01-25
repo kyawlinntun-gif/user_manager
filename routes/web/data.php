@@ -11,6 +11,7 @@ Route::prefix('accounts')->namespace('Accounts')->group(function() {
     Route::get('/user/{user?}', 'UserController@index');
     Route::prefix('updates')->namespace('Updates')->group(function() {
         Route::match(['put', 'patch'],'/user/{user}', 'UpdatedEmailController@update');
+        Route::match(['put', 'patch'], '/name/{user}', 'NameUpdatesController@update');
     });
 });
 

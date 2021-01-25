@@ -2,12 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdatedEmailRequest extends FormRequest
+class UpdatedNameRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -16,7 +14,7 @@ class UpdatedEmailRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::id() === $this->route('user')->id && Hash::check($this->password, Auth::user()->password);
+        return Auth::id() === $this->route('user')->id;
     }
 
     /**
@@ -27,7 +25,7 @@ class UpdatedEmailRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($this->user)],
+            'name' => 'required|min:3|regex:/[a-zA-z]/',
         ];
     }
 }

@@ -6387,6 +6387,18 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 //
 //
 //
@@ -6427,7 +6439,8 @@ __webpack_require__.r(__webpack_exports__);
       form: {
         email: '',
         password: ''
-      }
+      },
+      errors: []
     };
   },
   mounted: function mounted() {
@@ -6435,11 +6448,36 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     updatedEmail: function updatedEmail() {
+      var _this = this;
+
       axios.put('/data/accounts/updates/user/' + this.user.id, this.form).then(function (response) {
-        return console.log(response);
+        _this.resetForm();
+
+        _this.$emit('dashboard');
+
+        _this.$emit('updated-email', 'Successfully updated the email for ' + response.data.user.name);
       })["catch"](function (errors) {
-        return console.log(errors);
+        if (errors.response.status === 422) {
+          _this.flashErrors(errors.response.data.errors);
+        } else if (errors.response.status === 403) {
+          _this.errors = ["Not autorized to change this data. Please verfiy your password is corret"];
+        }
       });
+    },
+    flashErrors: function flashErrors(errors) {
+      for (var _i = 0, _Object$entries = Object.entries(errors); _i < _Object$entries.length; _i++) {
+        var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
+            key = _Object$entries$_i[0],
+            value = _Object$entries$_i[1];
+
+        for (var item in value) {
+          this.errors.push(value[item]);
+        }
+      }
+    },
+    resetForm: function resetForm() {
+      this.form.email = '';
+      this.form.password = '';
     }
   }
 });
@@ -6456,6 +6494,35 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _UpdatedEmail_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./UpdatedEmail.vue */ "./resources/js/components/accounts/UpdatedEmail.vue");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -6507,7 +6574,13 @@ __webpack_require__.r(__webpack_exports__);
       active: {
         dashboard: true,
         updatedEmail: false
-      }
+      },
+      success_message: '',
+      updated_name: true,
+      form: {
+        name: ''
+      },
+      errors: []
     };
   },
   methods: {
@@ -6525,6 +6598,70 @@ __webpack_require__.r(__webpack_exports__);
         _this2.active[key] = false;
       });
       this.active[component] = true;
+    },
+    updatedEmailFlashMessage: function updatedEmailFlashMessage(message) {
+      this.flashMessageIntervals(message);
+      this.getUser();
+    },
+    flashMessageIntervals: function flashMessageIntervals(message) {
+      var _this3 = this;
+
+      this.success_message = message;
+      setTimeout(function () {
+        _this3.success_message = '';
+      }, 5000);
+    },
+    updatedNameForm: function updatedNameForm() {
+      this.updated_name = false;
+      this.form.name = this.user.name;
+    },
+    updatedName: function updatedName() {
+      var _this4 = this;
+
+      axios.put('/data/accounts/updates/name/' + this.user.id, this.form).then(function (response) {
+        _this4.cancelName();
+
+        _this4.getUser();
+
+        _this4.flashMessageIntervals('Successfully updated name');
+      })["catch"](function (errors) {
+        if (errors.response.status === 403) {
+          _this4.errors = ["Not autorized to change this data. Please verfiy your password is corret"];
+        }
+
+        if (errors.response.status === 422) {
+          _this4.flashErrors(errors.response.data.errors);
+        }
+      }); // console.log(this.user.id);
+    },
+    cancelName: function cancelName() {
+      this.updated_name = true;
+      this.errors = [];
+    },
+    flashErrors: function flashErrors(errors) {
+      for (var _i = 0, _Object$entries = Object.entries(errors); _i < _Object$entries.length; _i++) {
+        var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
+            key = _Object$entries$_i[0],
+            value = _Object$entries$_i[1];
+
+        for (var item in value) {
+          this.errors.push(value[item]);
+        }
+      }
+    },
+    passwordReset: function passwordReset() {
+      var _this5 = this;
+
+      axios.post('/data/users/updated/send-reset-link/' + this.user.id).then(function (response) {
+        _this5.flashMessageIntervals('Successfully sent reset link to' + response.data.user.name);
+      });
+    }
+  },
+  filters: {
+    capitalize: function capitalize(value) {
+      if (!value) return '';
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
     }
   }
 });
@@ -42921,6 +43058,19 @@ var render = function() {
       _vm._v(" "),
       _c("hr"),
       _vm._v(" "),
+      _vm.errors.length > 0
+        ? _c(
+            "div",
+            { staticClass: "alert alert-warning", attrs: { role: "alert" } },
+            _vm._l(_vm.errors, function(error) {
+              return _c("ul", { key: error }, [
+                _c("li", [_vm._v(_vm._s(error))])
+              ])
+            }),
+            0
+          )
+        : _vm._e(),
+      _vm._v(" "),
       _c(
         "form",
         {
@@ -43032,6 +43182,31 @@ var render = function() {
             _c("div", { staticClass: "card-body" }, [
               _c("h3", [_vm._v("Account Settings")]),
               _vm._v(" "),
+              _c("hr"),
+              _vm._v(" "),
+              _vm.success_message != ""
+                ? _c("div", { staticClass: "alert alert-info" }, [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(_vm.success_message) +
+                        "\n            "
+                    )
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.errors.length > 0
+                ? _c(
+                    "div",
+                    { staticClass: "alert alert-danger" },
+                    _vm._l(_vm.errors, function(error) {
+                      return _c("ul", { key: error }, [
+                        _c("li", [_vm._v(_vm._s(error))])
+                      ])
+                    }),
+                    0
+                  )
+                : _vm._e(),
+              _vm._v(" "),
               _c(
                 "table",
                 { staticClass: "table table-hover table-borderless" },
@@ -43040,7 +43215,72 @@ var render = function() {
                     _c("tr", [
                       _c("th", [_vm._v("Name")]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(_vm.user.name))])
+                      _vm.updated_name
+                        ? _c("td", [
+                            _vm.updated_name
+                              ? _c("span", [_vm._v(_vm._s(_vm.user.name))])
+                              : _vm._e(),
+                            _c(
+                              "span",
+                              {
+                                staticClass: "ml-3 badge badge-warning",
+                                staticStyle: { cursor: "pointer" },
+                                on: { click: _vm.updatedNameForm }
+                              },
+                              [_vm._v("Update")]
+                            )
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      !_vm.updated_name
+                        ? _c("td", [
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.form.name,
+                                  expression: "form.name"
+                                }
+                              ],
+                              staticClass: "form-control-sm",
+                              attrs: { type: "text" },
+                              domProps: { value: _vm.form.name },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(
+                                    _vm.form,
+                                    "name",
+                                    $event.target.value
+                                  )
+                                }
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "ml-3 badge badge-primary",
+                                staticStyle: { cursor: "pointer" },
+                                on: { click: _vm.updatedName }
+                              },
+                              [_vm._v("Update")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "ml-3 badge badge-danger",
+                                staticStyle: { cursor: "pointer" },
+                                on: { click: _vm.cancelName }
+                              },
+                              [_vm._v("Cancel")]
+                            )
+                          ])
+                        : _vm._e()
                     ]),
                     _vm._v(" "),
                     _c("tr", [
@@ -43067,10 +43307,27 @@ var render = function() {
                     _c("tr", [
                       _c("th", [_vm._v("Role")]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(_vm.user.role))])
+                      _c("td", [
+                        _vm._v(_vm._s(_vm._f("capitalize")(_vm.user.role)))
+                      ])
                     ]),
                     _vm._v(" "),
-                    _vm._m(0),
+                    _c("tr", [
+                      _c("th", [_vm._v("Password")]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v("********** "),
+                        _c(
+                          "span",
+                          {
+                            staticClass: "ml-3 badge badge-primary",
+                            staticStyle: { cursor: "pointer" },
+                            on: { click: _vm.passwordReset }
+                          },
+                          [_vm._v("Send Reset Link")]
+                        )
+                      ])
+                    ]),
                     _vm._v(" "),
                     _c("tr", [
                       _c("th", [_vm._v("User Since")]),
@@ -43090,7 +43347,8 @@ var render = function() {
             on: {
               dashboard: function($event) {
                 return _vm.setActive("dashboard")
-              }
+              },
+              "updated-email": _vm.updatedEmailFlashMessage
             }
           })
         : _vm._e()
@@ -43098,23 +43356,7 @@ var render = function() {
     1
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("tr", [
-      _c("th", [_vm._v("Password")]),
-      _vm._v(" "),
-      _c("td", [
-        _vm._v("********** "),
-        _c("span", { staticClass: "ml-3 badge badge-primary" }, [
-          _vm._v("Send Reset Link")
-        ])
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -56515,6 +56757,9 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+// String.prototype.ucfirst = function() {
+//     return this.charAt(0).toUpperCase() + this.slice(1)
+// }
 
 /***/ }),
 
