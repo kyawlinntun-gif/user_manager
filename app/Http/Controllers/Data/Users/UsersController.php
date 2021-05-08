@@ -14,10 +14,9 @@ class UsersController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(function($request, $next) {
-            if(!Auth::user()->isAdmin())
-            {
-                return response('Unauthorized', 403); 
+        $this->middleware(function ($request, $next) {
+            if (!Auth::user()->isAdmin()) {
+                return response('Unauthorized', 403);
             }
 
             return $next($request);

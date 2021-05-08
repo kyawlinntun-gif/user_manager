@@ -7,21 +7,21 @@ use Illuminate\Support\Facades\Route;
  * namespace: Data
  */
 
-Route::prefix('accounts')->namespace('Accounts')->group(function() {
+Route::prefix('accounts')->namespace('Accounts')->group(function () {
     Route::get('/user/{user?}', 'UserController@index');
-    Route::prefix('updates')->namespace('Updates')->group(function() {
-        Route::match(['put', 'patch'],'/user/{user}', 'UpdatedEmailController@update');
+    Route::prefix('updates')->namespace('Updates')->group(function () {
+        Route::match(['put', 'patch'], '/user/{user}', 'UpdatedEmailController@update');
         Route::match(['put', 'patch'], '/name/{user}', 'NameUpdatesController@update');
     });
 });
 
-Route::prefix('users')->namespace('Users')->group(function() {
+Route::prefix('users')->namespace('Users')->group(function () {
 
-    Route::prefix('logs')->namespace('Logs')->group(function() {
+    Route::prefix('logs')->namespace('Logs')->group(function () {
         Route::get('/{user}', 'UserLogsController@index');
     });
 
-    Route::prefix('updated')->namespace('Updated')->group(function() {
+    Route::prefix('updated')->namespace('Updated')->group(function () {
         Route::match(['put', 'patch'], '/password/{user}', 'UpdatedUserPasswordController@update');
         Route::post('/send-reset-link/{user}', 'UpdatedUserPasswordController@sendResetLink');
     });

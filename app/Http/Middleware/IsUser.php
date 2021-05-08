@@ -16,8 +16,7 @@ class IsUser
      */
     public function handle($request, Closure $next)
     {
-        if(Auth::id() !== $request->route('user') && !Auth::user()->role === 'admin')
-        {
+        if (Auth::id() !== $request->route('user') && !Auth::user()->role === 'admin') {
             return response('unauthorized', 403);
         }
         return $next($request);

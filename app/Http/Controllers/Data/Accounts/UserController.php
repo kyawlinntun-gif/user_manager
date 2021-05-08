@@ -11,8 +11,7 @@ class UserController extends Controller
 {
     public function index(User $user = null)
     {
-        if($user == null)
-        {
+        if ($user == null) {
             return response([
                 'user' => Auth::user()
             ]);

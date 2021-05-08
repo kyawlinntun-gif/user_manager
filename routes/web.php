@@ -22,12 +22,12 @@ Auth::routes(['register' => false]);
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::prefix('users')->namespace('Users')->name('users.')->middleware(['web', 'auth'])->group(function() {
+Route::prefix('users')->namespace('Users')->name('users.')->middleware(['web', 'auth'])->group(function () {
     Route::get('/', 'UsersController@index')->name('dashboard');
 });
 
 Route::prefix('data')->namespace('Data')->middleware(['web', 'auth'])->group(base_path('routes/web/data.php'));
 
-Route::prefix('accounts')->namespace('Accounts')->name('accounts.')->middleware(['web', 'auth'])->group(function() {
+Route::prefix('accounts')->namespace('Accounts')->name('accounts.')->middleware(['web', 'auth'])->group(function () {
     Route::get('/', 'UserAccountsController@index')->name('dashboard');
 });
